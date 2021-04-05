@@ -32,7 +32,6 @@ public:
 	~TimerManager();
 	size_t addTimer(T1  SPHttpData, unsigned long timeout);
 
-	void handleExpiredEvent();
 //private:
 	typedef std::shared_ptr<TimerNode<T1>> SPTimerNode;
 	std::priority_queue<SPTimerNode, std::deque<SPTimerNode>, TimerCmp<T1>>
@@ -42,7 +41,7 @@ public:
 
 template<class T>  ///notice herer
 TimerNode<T>::TimerNode(T requestData, unsigned long timeout) ///not  TimerNode<class T> !!!
-	: deleted_(false),cb(requestData) {
+	: cb(requestData) {
 	struct timeval now;
 	gettimeofday(&now, NULL);
 	unsigned long   temp = now.tv_sec * 1000 + now.tv_usec / 1000;
@@ -77,19 +76,7 @@ size_t  TimerManager<T1>::addTimer(T1  SPHttpData, unsigned long timeout) {
 	
 }
 
-template <class T1>
-void TimerManager<T1>::handleExpiredEvent() {
-	// MutexLockGuard locker(lock);
-	while (!timerNodeQueue.empty()) {
-		SPTimerNode ptimer_now = timerNodeQueue.top();
-		if (ptimer_now->isDeleted())
-			timerNodeQueue.pop();
-		else if (ptimer_now->isValid() == false)
-			timerNodeQueue.pop();
-		else
-			break;
-	}
-}
+
 //// usage :
 //#include <functional>
 //using namespace std;
